@@ -1,3 +1,6 @@
+from collections import deque
+
+
 def create_initial_state(num_disks):
     """Create the initial Tower of Hanoi state."""
     return (tuple(range(num_disks, 0, -1)), (), ())
@@ -9,10 +12,7 @@ def create_goal_state(num_disks):
 
 
 def get_neighbors(state):
-    """
-    Generate all legal states that can be reached
-    from the current state using one move.
-    """
+    """Generate all legal next states."""
 
     neighbors = []
 
@@ -48,30 +48,53 @@ def get_neighbors(state):
     return neighbors
 
 
-def display_state(state):
-    print("Peg A:", state[0])
-    print("Peg B:", state[1])
-    print("Peg C:", state[2])
+def bfs_hanoi(num_disks):
+    """Solve Tower of Hanoi using Breadth-First Search."""
+
+    start = create_initial_state(num_disks)
+    goal = create_goal_state(num_disks)
+
+    queue = deque([(start, [])])
+
+    visited = {start}
+
+    while queue:
+
+        current_state, path = queue.popleft()
+
+        if current_state == goal:
+            return path
+
+        for next_state, move in get_neighbors(current_state):
+
+            if next_state not in visited:
+
+                visited.add(next_state)
+
+                new_path = path + [move]
+
+                queue.append((next_state, new_path))
+
+    return []
 
 
 def main():
+
     num_disks = 3
 
-    initial_state = create_initial_state(num_disks)
+    solution = bfs_hanoi(num_disks)
 
-    print("Tower of Hanoi State Transitions")
-    print("--------------------------------")
+    print("Tower of Hanoi - State Space Search")
+    print("-----------------------------------")
+    print("Number of disks:", num_disks)
+    print("Search algorithm: Breadth-First Search (BFS)")
 
-    print("\nInitial state:")
-    display_state(initial_state)
+    print("\nMove sequence:")
 
-    print("\nPossible next states:")
+    for number, move in enumerate(solution, start=1):
+        print(f"{number}. {move}")
 
-    neighbors = get_neighbors(initial_state)
-
-    for number, (state, move) in enumerate(neighbors, start=1):
-        print(f"\n{number}. {move}")
-        display_state(state)
+    print("\nTotal moves:", len(solution))
 
 
 if __name__ == "__main__":
